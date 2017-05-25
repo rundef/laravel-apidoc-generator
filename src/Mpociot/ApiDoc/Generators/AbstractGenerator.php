@@ -57,7 +57,7 @@ abstract class AbstractGenerator
                 'description' => [],
             ];
             foreach ($rules as $ruleName => $rule) {
-                $this->parseRule($rule, $attribute, $attributeData, $routeData['id']);
+                $this->parseRule($rule, $attribute, $attributeData, $routeData['id'], $routeData);
             }
             $routeData['parameters'][$attribute] = $attributeData;
         }
@@ -225,7 +225,7 @@ abstract class AbstractGenerator
      *
      * @return void
      */
-    protected function parseRule($rule, $ruleName, &$attributeData, $seed)
+    protected function parseRule($rule, $ruleName, &$attributeData, $seed, $routeData)
     {
         $faker = Factory::create();
         $faker->seed(crc32($seed));
@@ -246,8 +246,15 @@ abstract class AbstractGenerator
             case 'after':
                 $attributeData['type'] = 'date';
                 $format = isset($attributeData['format']) ? $attributeData['format'] : DATE_RFC850;
-                $attributeData['description'][] = Description::parse($rule)->with(date($format, strtotime($parameters[0])))->getDescription();
-                $attributeData['value'] = date($format, strtotime('+1 day', strtotime($parameters[0])));
+                if (strtotime($parameters[0]) === false) {
+                    $paramName = $parameters[0];
+
+                    $attributeData['description'][] = Description::parse($rule)->with($paramName)->getDescription();
+                    $attributeData['value'] = date($format, strtotime('+1 day', strtotime($routeData['parameters'][$paramName]['value'])));
+                } else {
+                    $attributeData['description'][] = Description::parse($rule)->with(date($format, strtotime($parameters[0])))->getDescription();
+                    $attributeData['value'] = date($format, strtotime('+1 day', strtotime($parameters[0])));
+                }
                 break;
             case 'alpha':
                 $attributeData['description'][] = Description::parse($rule)->getDescription();
@@ -289,8 +296,15 @@ abstract class AbstractGenerator
             case 'before':
                 $attributeData['type'] = 'date';
                 $format = isset($attributeData['format']) ? $attributeData['format'] : DATE_RFC850;
-                $attributeData['description'][] = Description::parse($rule)->with(date($format, strtotime($parameters[0])))->getDescription();
-                $attributeData['value'] = date($format, strtotime('-1 day', strtotime($parameters[0])));
+                if (strtotime($parameters[0]) === false) {
+                    $paramName = $parameters[0];
+
+                    $attributeData['description'][] = Description::parse($rule)->with($paramName)->getDescription();
+                    $attributeData['value'] = date($format, strtotime('-1 day', strtotime($routeData['parameters'][$paramName]['value'])));
+                } else {
+                    $attributeData['description'][] = Description::parse($rule)->with(date($format, strtotime($parameters[0])))->getDescription();
+                    $attributeData['value'] = date($format, strtotime('-1 day', strtotime($parameters[0])));
+                }
                 break;
             case 'date_format':
                 $attributeData['type'] = 'date';
