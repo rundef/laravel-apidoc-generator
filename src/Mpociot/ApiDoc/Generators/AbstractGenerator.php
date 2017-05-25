@@ -68,11 +68,12 @@ abstract class AbstractGenerator
     /**
      * @param  $route
      * @param  $bindings
+     * @param  $parameters
      * @param  $headers
      *
      * @return \Illuminate\Http\Response
      */
-    protected function getRouteResponse($route, $bindings, $headers = [])
+    protected function getRouteResponse($route, $bindings, $parameters = [], $headers = [])
     {
         $uri = $this->addRouteModelBindings($route, $bindings);
 
@@ -88,7 +89,7 @@ abstract class AbstractGenerator
         //Changes url with parameters like /users/{user} to /users/1
         $uri = preg_replace('/{(.*)}/', 1, $uri);
 
-        return $this->callRoute(array_shift($methods), $uri, [], [], [], $headers);
+        return $this->callRoute(array_shift($methods), $uri, $parameters, [], [], $headers);
     }
 
     /**
