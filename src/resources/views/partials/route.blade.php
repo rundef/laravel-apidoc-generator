@@ -10,7 +10,7 @@
 > Example request:
 
 ```bash
-curl "{{config('app.url')}}/{{ltrim($parsedRoute['uri'], '/')}}" \
+curl {{$parsedRoute['methods'][0] == 'GET' ? '-G ' : ' '}}"{{config('app.url')}}/{{ltrim($parsedRoute['uri'], '/')}}" \
 -H "Accept: application/json"@if(count($parsedRoute['parameters'])) \
 @foreach($parsedRoute['parameters'] as $attribute => $parameter)
     -d "{{$attribute}}"="{{$parameter['value']}}" \
