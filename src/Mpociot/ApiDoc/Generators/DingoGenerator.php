@@ -35,7 +35,9 @@ class DingoGenerator extends AbstractGenerator
 
         if ($withResponse) {
             foreach ($parameters['parameters'] as $paramName => $attr) {
-                $params[$paramName] = $attr['value'];
+                if ($attr['required']) {
+                    $params[$paramName] = $attr['value'];
+                }
             }
             try {
                 $response = $this->getRouteResponse($route, $bindings, $params, $headers);
